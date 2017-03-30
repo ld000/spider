@@ -75,12 +75,12 @@ class Location:
         items = re.findall(pattern, page)
         return items
 
-    def generate_sql(self, code, name, parent_code, parent_province, parent_city):
-        sql = 'INSERT INTO location(code, name, parent_code, province, city) VALUES'
-        sql = (sql + '(\'' + str(code)
-                                    + '\', \'' + str(name)
-                                    + '\', \'' + str(parent_code)
-                                    + '\', \'' + str(parent_province)
+    def generate_sql(self, code, name, parent_id, parent_province, parent_city):
+        sql = 'INSERT INTO location(code, name, parent_id, province, city) VALUES'
+        sql = (sql + '(' + str(code)
+                                    + ', \'' + str(name)
+                                    + '\', ' + str(parent_id)
+                                    + ', \'' + str(parent_province)
                                     + '\', \'' + str(parent_city)
                                     + '\');')
         return sql
@@ -90,7 +90,8 @@ class Location:
         parent_city = ''
         parent_province = ''
         contents = []
-        sql = 'INSERT INTO location(code, name, parent_code, province, city) VALUES'
+        a_id = 1
+        parent_id = 0
 
         code_pattern = '<span lang="EN-US">(.*?)<span>'
         code_pattern = re.compile(code_pattern, re.S)
@@ -112,13 +113,15 @@ class Location:
             # 省, 值包含一个匹配
             if (len(name_result) == 1):
                 parent_code = 0
+                parent_id = 0
                 parent_city = ''
                 parent_province = ''
 
                 name = html.unescape(name_result[0].strip())
 
-                contents.append(self.generate_sql(code, name, parent_code, parent_province, parent_city))
+                contents.append(self.generate_sql(code, name, parent_id, parent_province, parent_city))
                 parent_code = code
+                parent_id = a_id
                 parent_province = name
 
             # 市或区, 值包含两个匹配
@@ -126,11 +129,14 @@ class Location:
                 name = html.unescape(name_result[1].strip())
                 if (len(name_result[0]) == 1):  # 市, 前面只有 1 个空格
                     parent_city = ''
-                    contents.append(self.generate_sql(code, name, parent_code, parent_province, parent_city))
+                    contents.append(self.generate_sql(code, name, parent_id, parent_province, parent_city))
                     parent_city = name
                     parent_code = code
+                    parent_id = a_id
                 else:
-                    contents.append(self.generate_sql(code, name, parent_code, parent_province, parent_city))
+                    contents.append(self.generate_sql(code, name, parent_id, parent_province, parent_city))
+
+            a_id = a_id + 1
 
         return contents
 
