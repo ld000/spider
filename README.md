@@ -17,11 +17,13 @@ cd confluence
 scrapy crawl confluence
 ```
 
-### amazonsims 亚马逊 还买了什么 列表
+### amazonsims 
+
+亚马逊 还买了什么 列表
 
 ### confluence
 
-修改 `allowed_domains`, `start_urls`, `base_url`, `cookies` 参数
+修改 spider.py 里的 `allowed_domains`, `start_urls`, `base_url`, `cookies` 参数
 
 e.g
 ```
