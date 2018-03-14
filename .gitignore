@@ -5,6 +5,7 @@
 cscope.out
 download_file/
 data_utf8.json
+confluence/data
 # *.json
 .DS_Store
 dump.rdb
