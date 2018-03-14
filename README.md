@@ -23,6 +23,7 @@ scrapy crawl confluence
 
 修改 `allowed_domains`, `start_urls`, `base_url`, `cookies` 参数
 
+e.g
 ```
 allowed_domains = ["www.confluence.com"]
 start_urls = [
@@ -35,6 +36,6 @@ cookies = {
 }
 ```
 
-`JSESSIONID` 为登录后 cookies 里的 JSESSIONID，这里简单处理了，没有实现页面登录，有需要的自己实现下
+`JSESSIONID` 为登录后 cookies 里的 sessionId，这里简单处理了，没有实现页面登录，有需要的自己实现下
 
 
