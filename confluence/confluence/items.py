@@ -13,3 +13,8 @@ class ConfluenceItem(scrapy.Item):
     name = scrapy.Field()
     path = scrapy.Field()
     content = scrapy.Field()
+
+class ImgItem(scrapy.Item):
+    name = scrapy.Field()
+    path = scrapy.Field()
+    content = scrapy.Field()

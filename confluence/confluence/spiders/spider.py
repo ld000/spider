@@ -71,7 +71,7 @@ class confluenceSpider(scrapy.Spider):
       href = li.css('div.plugin_pagetree_children_content span ::attr(href)')[0].extract()
       url = self.base_url + href
     
-      logging.debug('yield url: ' + url)
+      logging.info('yield url: ' + url)
       yield scrapy.Request(url=url, callback=self.parse_page, cookies=self.cookies)
       
       # 是否有子菜单
@@ -79,12 +79,12 @@ class confluenceSpider(scrapy.Spider):
         if ('pageId' in href):
           parsed = urlparse.urlparse(href)
           
-          logging.debug('parse sub menu, href: ' + href)
+          logging.info('parse sub menu, href: ' + href)
 
           pageId = urlparse.parse_qs(parsed.query)['pageId'][0]
           sub_url = self.base_url + self.sub_url + '&pageId=' + pageId + '&_=' + str((int(round(time.time() * 1000))))
 
-          logging.debug('yield url: ' + sub_url)
+          logging.info('yield url: ' + sub_url)
           yield scrapy.Request(url=sub_url, callback=self.sub_ajax_menu, cookies=self.cookies)
         else:
           urlx = self.base_url + href
@@ -93,18 +93,44 @@ class confluenceSpider(scrapy.Spider):
       
   # 处理页面内容
   def parse_page(self, response):
+    content_selector = content = response.css('div#content div.wiki-content')
     title = response.css('span#title-text a::text')[0].extract()
     bread_crumbs = response.css('ol#breadcrumbs a::text').extract()
-    content = response.css('div#content div.wiki-content')[0].extract()
+    content = content_selector[0].extract()
 
     path = ''
     for bread_crumb in bread_crumbs:
       path = path + bread_crumb + '/'
 
+    # 图片信息
+    content = content.replace('&amp;', '&')
+    imgs = content_selector.css('img')
+    i = 1
+    for img in imgs:
+      src = img.css('::attr(src)')[0].extract()
+      img_name = title + str(i) + '.png'
+      # content = content.decode('utf-8').replace(src.decode('utf-8'), img_name).encode('utf-8')
+      content = content.replace(src.decode('utf-8'), img_name)
+      i += 1
+
+      img_url = self.base_url + src
+      yield scrapy.Request(url=img_url, callback=self.parse_img, cookies=self.cookies, meta={
+        'img_name': img_name,
+        'path': path
+      })
+
     item = ConfluenceItem()
     item['name'] = title
     item['path'] = path
     item['content'] = content
+
+    yield item
+
+  def parse_img(self, response):
+    item = ImgItem()
+    item['name'] = response.meta['img_name']
+    item['path'] = response.meta['path']
+    item['content'] = response.body
 
     yield item
 

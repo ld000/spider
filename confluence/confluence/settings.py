@@ -21,6 +21,8 @@ BOT_NAME = 'confluence'
 SPIDER_MODULES = ['confluence.spiders']
 NEWSPIDER_MODULE = 'confluence.spiders'
 
+LOG_LEVEL = 'INFO'
+
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'confluence (+http://www.yourdomain.com)'
@@ -78,6 +80,7 @@ DOWNLOADER_MIDDLEWARES = {
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    'confluence.pipelines.ConfluencePipeline': 300,
+   'confluence.pipelines.ImgPipeline': 301,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
