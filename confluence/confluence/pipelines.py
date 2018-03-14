@@ -12,6 +12,7 @@ from os.path import dirname
 import errno
 import requests
 from confluence.items import *
+import re
 
 class ConfluencePipeline(object):
     def process_item(self, item, spider):
@@ -27,7 +28,17 @@ class ConfluencePipeline(object):
           if exc.errno != errno.EEXIST:
             raise
 
-      content = html2text.html2text(item['content'])
+      # 替换 td 里的 p strong，cuz html2text 不支持
+      content = item['content']
+      content = re.sub(r'(<p>)(<strong>)', r'\1', content)
+      content = re.sub(r'(</strong>)(</p>)', r'\2', content)
+      content = re.sub(r'(<td.*?>)(<p>)', r'\1', content)
+      content = re.sub(r'(</p>)(</td>)', r'\2', content)
+
+      text_maker = html2text.HTML2Text()
+      # text_maker.unifiable = True
+      # text_maker.single_line_break = True
+      content = text_maker.handle(content)
       with codecs.open(fullpath, 'w', encoding='utf-8') as f:
         f.write(content)
 
