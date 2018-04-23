@@ -41,4 +41,8 @@ cookies = {
 
 `JSESSIONID` 为登录后 cookies 里的 sessionId，这里简单处理了，没有实现页面登录，有需要的自己实现下
 
+### babynames
 
+`https://www.familyeducation.com/baby-names/browse-origin/surname`
+
+爬取各国家人名
